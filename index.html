@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cleitinho Bot</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #16172d;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .chat-box {
+      background: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 400px;
+      padding: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      height: 80vh;
+    }
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .chat-header img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+    .chat-header h2 {
+      font-size: 16px;
+      margin: 0;
+      color: #fff;
+    }
+    .chat-header {
+      background-color: #0c1024;
+      padding: 10px;
+      border-radius: 12px 12px 0 0;
+    }
+    .messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+    .message {
+      background-color: #f2f2f2;
+      padding: 10px;
+      border-radius: 10px;
+      margin: 5px 0;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .user {
+      background-color: #d1f5dc;
+      align-self: flex-end;
+    }
+    .typing {
+      width: 25px;
+      height: 10px;
+      margin-left: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .typing span {
+      width: 6px;
+      height: 6px;
+      background-color: #999;
+      border-radius: 50%;
+      animation: blink 1.4s infinite ease-in-out both;
+    }
+    .typing span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .typing span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    @keyframes blink {
+      0%, 80%, 100% { transform: scale(0); } 
+      40% { transform: scale(1.0); }
+    }
+    .input-area {
+      display: flex;
+      gap: 10px;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+    button {
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+    button img {
+      width: 26px;
+      height: 26px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-box">
+    <div class="chat-header">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/OOjs_UI_icon_userAvatar.svg/1024px-OOjs_UI_icon_userAvatar.svg.png" alt="Cleitinho Avatar" />
+      <h2>Cleitinho</h2>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+      <input id="input" type="text" placeholder="Digite sua pergunta..." autofocus />
+      <button onclick="sendMessage()">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAATlBMVEVHcEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACl2JjUAAAAGXRSTlMAECAwQFBgcICAgYKDk5ubp6u/v7//4CHgAAACVSURBVBgZBcFJEoAgCAXQ8M63zsz//2MWaXKYxWMOJvBspG9MyGVKmC8BIizdiB9I5K2bAAAAAElFTkSuQmCC" alt="Enviar" />
+      </button>
+    </div>
+  </div>
+
+  <audio id="ping" src="https://assets.mixkit.co/active_storage/sfx/1101/1101-preview.mp3" preload="auto"></audio>
+
+  <script>
+    const messagesDiv = document.getElementById("messages");
+    const input = document.getElementById("input");
+    const ping = document.getElementById("ping");
+
+    input.addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        sendMessage();
+      }
+    });
+
+    function appendMessage(text, isUser = false) {
+      const msg = document.createElement("div");
+      msg.className = "message" + (isUser ? " user" : "");
+      msg.textContent = text;
+      messagesDiv.appendChild(msg);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function appendTyping() {
+      const typing = document.createElement("div");
+      typing.className = "message";
+      typing.id = "typing";
+      typing.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+      messagesDiv.appendChild(typing);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function removeTyping() {
+      const typing = document.getElementById("typing");
+      if (typing) typing.remove();
+    }
+
+    function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+      appendMessage(text, true);
+      input.value = "";
+      input.focus();
+
+      appendTyping();
+
+      setTimeout(async () => {
+        try {
+          // Aqui virá a chamada real para seu backend com contexto vetorial
+          removeTyping();
+          ping.play();
+          appendMessage("Opa, parece que faltou um pedacinho aí. Me manda mais detalhes.");
+        } catch (err) {
+          removeTyping();
+          appendMessage("⚠️ Erro ao se conectar com o Cleitinho. Tente novamente em instantes.");
+        }
+      }, 1200);
+    }
+  </script>
+</body>
+</html>
