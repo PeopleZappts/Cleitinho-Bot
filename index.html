@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cleitinho Bot Premium</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: #16172d;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .chat-box {
+      background: white;
+      width: 100%;
+      max-width: 400px;
+      height: 90vh;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      overflow: hidden;
+    }
+    .chat-header {
+      background: #0f122b;
+      color: white;
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      gap: 10px;
+    }
+    .chat-header img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+    }
+    .chat-messages {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .message {
+      max-width: 80%;
+      margin-bottom: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .user {
+      align-self: flex-end;
+      background: #dcfce7;
+    }
+    .bot {
+      align-self: flex-start;
+      background: #f1f5f9;
+    }
+    .typing {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+      margin-bottom: 12px;
+    }
+    .typing span {
+      width: 6px;
+      height: 6px;
+      background-color: #999;
+      border-radius: 50%;
+      animation: blink 1.5s infinite ease-in-out;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 1; }
+    }
+    .chat-input {
+      display: flex;
+      padding: 12px;
+      border-top: 1px solid #ddd;
+      background: #fff;
+    }
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+    .chat-input button {
+      margin-left: 10px;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .chat-input button svg {
+      width: 20px;
+      height: 20px;
+      fill: #0f172a;
+      transition: transform 0.2s;
+    }
+    .chat-input button:hover svg {
+      transform: scale(1.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-box">
+    <div class="chat-header">
+      <img src="cleitinho-avatar.png" alt="Cleitinho Avatar">
+      <strong>Cleitinho</strong>
+    </div>
+    <div class="chat-messages" id="chat"></div>
+    <div class="chat-input">
+      <input id="input" type="text" placeholder="Digite sua pergunta...">
+      <button onclick="sendMessage()" aria-label="Enviar">
+        <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+      </button>
+    </div>
+  </div>
+  <audio id="ping" src="ping.mp3" preload="auto"></audio>
+  <script>
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("input");
+    const ping = document.getElementById("ping");
+
+    function appendMessage(text, sender) {
+      const div = document.createElement("div");
+      div.className = "message " + sender;
+      div.textContent = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+      if (sender === "bot") ping.play();
+    }
+
+    function showTyping() {
+      const div = document.createElement("div");
+      div.className = "typing";
+      div.id = "typing";
+      div.innerHTML = "<span></span><span></span><span></span>";
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function removeTyping() {
+      const typing = document.getElementById("typing");
+      if (typing) typing.remove();
+    }
+
+    function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+      appendMessage(text, "user");
+      input.value = "";
+      input.focus();
+      showTyping();
+
+      setTimeout(() => {
+        removeTyping();
+        appendMessage("🤖 Cleitinho não conseguiu responder agora. Tente de novo mais tarde.", "bot");
+        localStorage.setItem("cleitinho-history", chat.innerHTML);
+      }, 1500);
+    }
+
+    window.onload = () => {
+      const history = localStorage.getItem("cleitinho-history");
+      if (history) chat.innerHTML = history;
+      chat.scrollTop = chat.scrollHeight;
+    };
+
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>
