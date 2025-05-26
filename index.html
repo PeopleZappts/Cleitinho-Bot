@@ -137,7 +137,7 @@
       div.textContent = text;
       chat.appendChild(div);
       chat.scrollTop = chat.scrollHeight;
-      // Toca o som de envio para qualquer mensagem
+      // Som de envio para qualquer mensagem
       send.currentTime = 0;
       send.volume = 0.3;
       send.play().catch(error => console.log('Erro ao tocar send:', error));
@@ -160,16 +160,30 @@
     function sendMessage() {
       const text = input.value.trim();
       if (!text) return;
+
       appendMessage(text, "user");
       input.value = "";
       input.focus();
       showTyping();
 
-      setTimeout(() => {
+      fetch("https://zpt-dev.zappts.com.br/webhook-test/cleitinho-zskill", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ pergunta: text })
+      })
+      .then(response => response.json())
+      .then(data => {
         removeTyping();
-        appendMessage("🤖 Cleitinho não conseguiu responder agora. Tente de novo mais tarde.", "bot");
+        appendMessage(data.resposta || "🤖 Cleitinho está sem resposta no momento. Tente mais tarde.", "bot");
         localStorage.setItem("cleitinho-history", chat.innerHTML);
-      }, 1500);
+      })
+      .catch(error => {
+        console.error("Erro ao falar com Cleitinho:", error);
+        removeTyping();
+        appendMessage("🤖 O Cleitinho travou aqui 😅 Tenta de novo mais tarde.", "bot");
+      });
     }
 
     window.onload = () => {
